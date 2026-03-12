@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "author": "Gabriel",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-xiao-esp32-c3",
+      "id": "esp",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-ili9341",
+      "id": "lcd1",
+      "top": -250,
+      "left": -200,
+      "rotate": 270,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-analog-joystick",
+      "id": "joystick1",
+      "top": -100,
+      "left": 180,
+      "rotate" : 270,
+      "attrs": {}
+    }
+  ],
+  "connections": [
+    ["esp:D7", "lcd1:CS", "green", ["v0"]],
+    ["esp:D10", "lcd1:MOSI", "blue", ["v0"]],
+    ["esp:D8", "lcd1:SCK", "white", ["v0"]],
+    ["esp:D4", "lcd1:D/C", "violet", ["v0"]],
+    ["esp:D9", "lcd1:RST", "orange", ["v0"]],
+    ["esp:3V3", "lcd1:VCC", "red", ["v0"]],
+    ["esp:GND", "lcd1:GND", "black", ["v0"]],
+    ["esp:3V3", "lcd1:LED", "red", ["v0"]],
+
+    ["joystick1:VCC", "esp:3V3", "red", ["v0"]],
+    ["joystick1:GND", "esp:GND", "black", ["v0"]],
+    ["joystick1:HORZ", "esp:D1", "gold", ["v0"]],
+    ["joystick1:VERT", "esp:D2", "orange", ["v0"]],
+    ["joystick1:SEL", "esp:D3", "green", ["v0"]]
+
+  ]
+}
