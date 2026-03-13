@@ -6,7 +6,7 @@ Um jogo Snake clássico rodando em um microcontrolador ESP32C3 com display TFT S
 
 <!-- 
   📸 NOTA SOBRE EXTENSÕES:
-  Se suas imagens forem .png em vez de .jpg, troque as extensões abaixo.
+  Se suas imagens forem .png em vez de .jpeg, troque as extensões abaixo.
   Para verificar: Explorer do Windows → View → File name extensions
 -->
 
@@ -39,7 +39,7 @@ Um jogo Snake clássico rodando em um microcontrolador ESP32C3 com display TFT S
 ## 📸 Hardware
 
 <p align="center">
-  <img src="docs/FOTO_PROTOBOARD.jpg" alt="Montagem na protoboard" width="400"/>
+  <img src="docs/FOTO_PROTOBOARD.jpeg" alt="Montagem na protoboard" width="400"/>
 </p>
 
 | Componente | Modelo / Spec |
@@ -68,13 +68,13 @@ Um jogo Snake clássico rodando em um microcontrolador ESP32C3 com display TFT S
 ## 🖥️ Telas do Jogo
 
 <p align="center">
-  <img src="docs/FOTO_TELA_INICIAL.jpg" alt="Tela inicial" width="250"/>
-  <img src="docs/FOTO_JOGANDO.jpg" alt="Jogando" width="250"/>
-  <img src="docs/FOTO_GAMEOVER.jpg" alt="Game Over" width="250"/>
+  <img src="docs/FOTO_TELA_INICIAL.jpeg" alt="Tela inicial" width="250"/>
+  <img src="docs/FOTO_JOGANDO.jpeg" alt="Jogando" width="250"/>
+  <img src="docs/FOTO_GAMEOVER.jpeg" alt="Game Over" width="250"/>
 </p>
 
 <p align="center">
-  <img src="docs/BUFF.jpg" alt="Fruta com buff" width="250"/>
+  <img src="docs/BUFF.gif" alt="Fruta com buff" width="250"/>
 </p>
 
 ---
@@ -87,15 +87,15 @@ Um jogo Snake clássico rodando em um microcontrolador ESP32C3 com display TFT S
                     └──────┬───────┘
                            │
                     ┌──────▼───────┐
-               ┌────┤    loop()    ├────────┐
-               │    └──────────────┘        │
-               │                            │
+               ┌────┤    loop()    ├─────────┐
+               │    └──────────────┘         │
+               │                             │
      ┌─────────▼──────────┐     ┌────────────▼─────────────┐
      │  ESTADO_INICIO      │    │  ESTADO_GAMEOVER         │
      │  tickAnimacao()     │    │  Mostra score            │
      │  Cobra decorativa   │    │  Aguarda botão SW        │
      │  por waypoints      │    │  → volta a ESTADO_INICIO │
-     └─────────┬───────────┘    └────────────▲─────────────┘
+     └─────────┬───────────┘    └─────────────────▲────────┘
                │ (move joystick)                  │ (colisão)
      ┌─────────▼───────────┐                      │
      │  ESTADO_JOGANDO     │──────────────────────┘
