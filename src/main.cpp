@@ -81,7 +81,7 @@ int porcentagemBuff = 20; //PORCENTAGEM DE SER FRUTA COM BUFF (0 - 100)
 unsigned long inicioBuff = 0;
 bool buffAtivo = false;
 int velocidadeAntesBuff;
-int tempoBuff = 3000; //DURAÇÃO DO BUFF
+int tempoBuff = 2000; //DURAÇÃO DO BUFF
 
 #define ESTADO_INICIO     0
 #define ESTADO_JOGANDO    1
@@ -237,8 +237,8 @@ void iniciarJogo() {
   proximaDirecao = DIREITA;      //buffer de input zerado
   pontos         = 0;
   gameOver = false;
-  velocidadeJogo = 400;
-  aumentoVelRate = 0.97;
+  velocidadeJogo = 300;
+  aumentoVelRate = 0.95;
   pontosVitoria = 30;
 
 
