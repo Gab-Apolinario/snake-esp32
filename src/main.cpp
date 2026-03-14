@@ -34,7 +34,7 @@ Adafruit_ST7735 display = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 // Score bar:    y=2  até y=11  (10px, textSize 1 = 8px)
 // X:            x=4  até x=124 (120px → 15 colunas de 8px)
 #define CEL        8                   //tamanho de cada célula em pixels
-#define COLUNAS    16                  //quantas células cabem na horizontal
+#define COLUNAS    15                  //quantas células cabem na horizontal
 #define LINHAS     14                  //quantas células cabem na vertical
 #define AREA_X     TELA_X_MIN          // 4
 #define AREA_Y     12                  // abaixo da barra de score
@@ -141,6 +141,15 @@ void desenharScore() {
   sprintf(buf, "SNAKE  SCORE: %d/%d ", pontos, pontosVitoria);
   display.print(buf);
   display.drawFastHLine(TELA_X_MIN, 11, 121, CINZA);  //linha separadora
+  
+  //Desenhar paredes
+  display.drawRect(
+    AREA_X - 1,              // x — 1px à esquerda do grid
+    AREA_Y - 1,              // y — 1px acima do grid  
+    COLUNAS * CEL + 1,       // largura — cobre toda a área jogável
+    LINHAS  * CEL + 2,       // altura — cobre toda a área jogável
+    CINZA                    // mesma cor da linha do score
+  );
 }
 
 void gerarComida(){
@@ -380,14 +389,14 @@ void telaInicio() {
 
 void telaGameOver() {
   // overlay preenche área de jogo
-  display.fillRect(AREA_X, AREA_Y, 127, 112, PRETO);
+  display.fillRect(AREA_X, AREA_Y, 127, 112, VERMELHO);
 
   estadoJogo = ESTADO_GAMEOVER;
 
-  display.setTextSize(2);
-  display.setTextColor(VERMELHO);
-  printCentrado("GAME", 30, VERMELHO, 2, PRETO);
-  printCentrado("OVER", 52, VERMELHO, 2, PRETO);
+  // display.setTextSize(2);
+  // display.setTextColor(VERMELHO);
+  printCentrado("GAME", 30, BRANCO, 2, BRANCO);
+  printCentrado("OVER", 52, BRANCO, 2, BRANCO);
 
   display.setTextSize(1);
   display.setTextColor(VERDE);
@@ -438,7 +447,7 @@ void setup() {
   uint8_t madctl = 0xE0;  // rotação 3 + espelha colunas
   display.sendCommand(ST77XX_MADCTL, &madctl, 1);
 #else
-  display.setRotation(1);
+  display.setRotation(3);
 #endif
 
   randomSeed(analogRead(A0));
