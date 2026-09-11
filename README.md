@@ -14,9 +14,6 @@ Um jogo Snake completo rodando em um microcontrolador ESP32C3 com display TFT ST
   <img src="docs/FOTO_TELA_INICIAL.jpeg" alt="Tela inicial" width="250"/>
   <img src="docs/FOTO_JOGANDO.jpeg" alt="Jogando" width="250"/>
   <img src="docs/FOTO_GAMEOVER.jpeg" alt="Game Over" width="250"/>
-</p>
-
-<p align="center">
   <img src="docs/GIF_INICIO_LOOP.gif" alt="Animação tela inicial" width="250"/>
   <img src="docs/GIF_JOGANDO.gif" alt="Gameplay" width="250"/>
   <img src="docs/GIF_VITORIA.gif" alt="Tela de vitória" width="250"/>
