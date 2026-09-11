@@ -1,26 +1,30 @@
 # 🐍 Snake Game — ESP32C3 + TFT Display + MPU-6050
 
 Um jogo Snake completo rodando em um microcontrolador ESP32C3 com display TFT ST7735 de 128x128 pixels, construído do zero em C++ com PlatformIO.
-
-> 🇧🇷 Projeto de aprendizado: dev Unity/C# migrando para embedded systems e Arduino/C++.
-
-<!-- 
-  📸 INSTRUÇÃO: Substitua o bloco abaixo por uma foto ou GIF do projeto funcionando!
   
-  Exemplo com imagem local (coloque na pasta docs/):
-  ![Snake rodando no display](docs/snake-demo.gif)
-  
-  Exemplo com link externo (ex: imgur):
-  ![Snake rodando no display](https://i.imgur.com/SEU_LINK.gif)
--->
+<p align="center">
+  <img src="docs/MPU_SNAKE.gif" alt="Snake com controle MPU-6050" width="400"/>
+</p>
 
-```
-┌────────────────────────────┐
-│  📸 Adicione aqui uma      │
-│  foto ou GIF do display    │
-│  com o jogo rodando!       │
-└────────────────────────────┘
-```
+---
+
+## 🖥️ Telas do Jogo
+
+<p align="center">
+  <img src="docs/FOTO_TELA_INICIAL.jpeg" alt="Tela inicial" width="250"/>
+  <img src="docs/FOTO_JOGANDO.jpeg" alt="Jogando" width="250"/>
+  <img src="docs/FOTO_GAMEOVER.jpeg" alt="Game Over" width="250"/>
+</p>
+
+<p align="center">
+  <img src="docs/GIF_INICIO_LOOP.gif" alt="Animação tela inicial" width="250"/>
+  <img src="docs/GIF_JOGANDO.gif" alt="Gameplay" width="250"/>
+  <img src="docs/GIF_VITORIA.gif" alt="Tela de vitória" width="250"/>
+</p>
+
+<p align="center">
+  <img src="docs/BUFF.gif" alt="Fruta com buff" width="250"/>
+</p>
 
 ---
 
@@ -40,6 +44,10 @@ Um jogo Snake completo rodando em um microcontrolador ESP32C3 com display TFT ST
 ---
 
 ## 🔧 Hardware Utilizado
+
+<p align="center">
+  <img src="docs/FOTO_PROTOBOARD.jpeg" alt="Montagem na protoboard" width="400"/>
+</p>
 
 | Componente | Modelo / Spec |
 |---|---|
