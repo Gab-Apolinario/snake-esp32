@@ -1,52 +1,52 @@
-# 🐍 Snake Game — ESP32C3 + TFT Display
+# 🐍 Snake Game — ESP32C3 + TFT Display + MPU-6050
 
-Um jogo Snake clássico rodando em um microcontrolador ESP32C3 com display TFT ST7735 de 128x128 pixels, construído do zero em C++ com PlatformIO.
+Um jogo Snake completo rodando em um microcontrolador ESP32C3 com display TFT ST7735 de 128x128 pixels, construído do zero em C++ com PlatformIO.
 
-> 🎮 Projeto de estudo: sou aluno de **Jogos Digitais** e desenvolvia apenas em C# com Unity. Ganhei um kit com ESP32 e 37 sensores e decidi mergulhar no mundo de hardware e C++. Em menos de **48 horas**, saí do zero absoluto nessa linguagem para um jogo funcional com múltiplas telas, animações e mecânicas dinâmicas — e foi incrivelmente gratificante perceber como o conhecimento de uma linguagem se transfere para outra.
+> 🇧🇷 Projeto de aprendizado: dev Unity/C# migrando para embedded systems e Arduino/C++.
 
 <!-- 
-  📸 NOTA SOBRE EXTENSÕES:
-  Se suas imagens forem .png em vez de .jpeg, troque as extensões abaixo.
-  Para verificar: Explorer do Windows → View → File name extensions
+  📸 INSTRUÇÃO: Substitua o bloco abaixo por uma foto ou GIF do projeto funcionando!
+  
+  Exemplo com imagem local (coloque na pasta docs/):
+  ![Snake rodando no display](docs/snake-demo.gif)
+  
+  Exemplo com link externo (ex: imgur):
+  ![Snake rodando no display](https://i.imgur.com/SEU_LINK.gif)
 -->
 
-<p align="center">
-  <img src="docs/GIF_JOGANDO.gif" alt="Snake gameplay" width="300"/>
-  <img src="docs/GIF_INICIO.gif" alt="Tela de início animada" width="300"/>
-</p>
-
-<p align="center">
-  <img src="docs/GIF_VITORIA.gif" alt="Tela de vitória" width="300"/>
-  <img src="docs/GIF_INICIO_LOOP.gif" alt="Loop da animação de início" width="300"/>
-</p>
+```
+┌────────────────────────────┐
+│  📸 Adicione aqui uma      │
+│  foto ou GIF do display    │
+│  com o jogo rodando!       │
+└────────────────────────────┘
+```
 
 ---
 
 ## 🎮 Funcionalidades
 
-- **Tela de início animada** com cobra decorativa que se move por waypoints e cresce em pontos específicos
-- **Gameplay completo** com detecção de colisão (paredes e corpo próprio)
-- **Velocidade dinâmica** que aumenta progressivamente a cada comida consumida
-- **Sistema de buff** — frutas especiais com probabilidade configurável que dão efeitos extras
-- **Condição de vitória** por pontuação (valor configurável)
-- **Tela de game over e vitória** com score final e opção de reiniciar
-- **Máquina de estados** com 3 estados: `ESTADO_INICIO`, `ESTADO_JOGANDO`, `ESTADO_GAMEOVER`
-- **Controle por joystick analógico**
-- **Variáveis de fácil acesso** para ajuste rápido de mecânicas (pontos pra vitória, tamanho inicial da cobra, probabilidade de buff, fator de velocidade, etc.)
+- **Tela de início animada** com cobra decorativa que se move por waypoints e cresce nos cantos
+- **Dois modos de controle** alternáveis em runtime via botão SW do joystick:
+  - 🕹️ **Joystick analógico** — controle clássico XY
+  - 🤚 **MPU-6050** — inclinar a mão controla a direção da cobra
+- **Fruta especial (buff)** — 20% de chance de spawnar uma fruta azul que aplica efeito de câmera lenta por 2 segundos (sem dar ponto)
+- **Velocidade dinâmica** que aumenta progressivamente (×0.95) a cada fruta normal coletada
+- **Condição de vitória** configurável via `pontosVitoria`
+- **Máquina de estados** com 4 estados: `ESTADO_INICIO`, `ESTADO_JOGANDO`, `ESTADO_GAMEOVER`, `ESTADO_VITORIA`
+- **Loop não-bloqueante** com `millis()` — o input responde instantaneamente mesmo durante o tick do jogo
+- **Compatível com simulador Wokwi** via `#define WOKWI_SIM`
 
 ---
 
-## 📸 Hardware
-
-<p align="center">
-  <img src="docs/FOTO_PROTOBOARD.jpeg" alt="Montagem na protoboard" width="400"/>
-</p>
+## 🔧 Hardware Utilizado
 
 | Componente | Modelo / Spec |
 |---|---|
 | Microcontrolador | **ESP32C3 XIAO** (Seeed Studio) |
 | Display | **ST7735** 128×128 BGR (SPI) |
-| Joystick | Analógico XY + botão SW |
+| Acelerômetro/Giroscópio | **MPU-6050** (I2C) |
+| Joystick | Analógico XY + botão SW (kit KUONGSHUN) |
 | Kit de sensores | KUONGSHUN 37-in-1 |
 
 ### 📌 Mapa de Pinos
@@ -55,27 +55,31 @@ Um jogo Snake clássico rodando em um microcontrolador ESP32C3 com display TFT S
 |---|---|---|
 | A1 | Eixo X | Joystick |
 | A2 | Eixo Y | Joystick |
-| D3 | Botão SW | Joystick |
+| D3 | Botão SW — toggle de modo de controle | Joystick |
 | D4 | DC | Display ST7735 |
-| D6 | Output | LED |
+| D5 | SCL (clock I2C) | MPU-6050 |
+| D6 | SDA (dados I2C) | MPU-6050 |
 | D7 | CS | Display ST7735 |
 | D8 | SCK | Display ST7735 |
 | D9 | RST | Display ST7735 |
 | D10 | MOSI | Display ST7735 |
 
+> ⚠️ O display usa SPI e o MPU-6050 usa I2C — os dois protocolos coexistem sem conflito no ESP32C3.
+
+> ⚠️ O pino SDA do módulo ST7735 corresponde ao MOSI do SPI — nomenclatura do fabricante.
+
 ---
 
-## 🖥️ Telas do Jogo
+## 🕹️ Como jogar
 
-<p align="center">
-  <img src="docs/FOTO_TELA_INICIAL.jpeg" alt="Tela inicial" width="250"/>
-  <img src="docs/FOTO_JOGANDO.jpeg" alt="Jogando" width="250"/>
-  <img src="docs/FOTO_GAMEOVER.jpeg" alt="Game Over" width="250"/>
-</p>
-
-<p align="center">
-  <img src="docs/BUFF.gif" alt="Fruta com buff" width="250"/>
-</p>
+1. Ao ligar, aparece a tela de início com a cobra animada
+2. **Mova o joystick** (ou incline o MPU-6050) para iniciar
+3. Controle a cobra para comer as frutas:
+   - 🔴 **Fruta vermelha** — +1 ponto, cobra cresce, velocidade aumenta
+   - 🔵 **Fruta azul (buff)** — cobra cresce, câmera lenta por 2s, sem ponto
+4. Evite colidir com as paredes ou com o próprio corpo
+5. Alcance `pontosVitoria` pontos para vencer
+6. **Clique o SW do joystick** a qualquer momento para alternar entre joystick e MPU-6050
 
 ---
 
@@ -86,122 +90,124 @@ Um jogo Snake clássico rodando em um microcontrolador ESP32C3 com display TFT S
                     │   setup()    │
                     └──────┬───────┘
                            │
-                    ┌──────▼───────┐
-               ┌────┤    loop()    ├─────────┐
-               │    └──────────────┘         │
-               │                             │
-     ┌─────────▼──────────┐     ┌────────────▼─────────────┐
-     │  ESTADO_INICIO      │    │  ESTADO_GAMEOVER         │
-     │  tickAnimacao()     │    │  Mostra score            │
-     │  Cobra decorativa   │    │  Aguarda botão SW        │
-     │  por waypoints      │    │  → volta a ESTADO_INICIO │
-     └─────────┬───────────┘    └─────────────────▲────────┘
-               │ (move joystick)                  │ (colisão)
-     ┌─────────▼───────────┐                      │
-     │  ESTADO_JOGANDO     │──────────────────────┘
-     │  tickJogo()         │
-     │  Movimentação       │
-     │  Colisão            │
-     │  Spawn de comida    │
-     │  Velocidade dinâm.  │
-     └─────────────────────┘
+                    ┌──────▼────────────────────────────┐
+                    │            loop()                  │
+                    │  verificarToggle() — SW alterna    │
+                    │  lerControle()    — joy ou MPU     │
+                    └──┬────────┬──────────┬─────────────┘
+                       │        │          │
+          ┌────────────▼──┐ ┌───▼──────┐ ┌▼─────────────────┐
+          │ ESTADO_INICIO  │ │GAMEOVER  │ │ ESTADO_VITORIA    │
+          │ tickAnimacao() │ │VITORIA   │ │ Aguarda movimento │
+          │ Cobra circular │ │Score     │ │ → ESTADO_JOGANDO  │
+          │ por waypoints  │ │Reinicia  │ └──────────────────┘
+          └────────┬───────┘ └───▲──────┘
+                   │ (movimento)  │ (colisão ou vitória)
+          ┌────────▼─────────────┴──┐
+          │     ESTADO_JOGANDO       │
+          │  tickJogo()              │
+          │  Movimentação + colisão  │
+          │  Spawn de comida         │
+          │  Buff de câmera lenta    │
+          │  Velocidade dinâmica     │
+          └──────────────────────────┘
+```
+
+### Sistema de controle dual
+
+```
+SW clicado
+     │
+     ▼
+verificarToggle()
+     │
+     ├── modoControle = CONTROLE_JOYSTICK → lerJoystick()
+     │                                      analogRead() XY
+     │
+     └── modoControle = CONTROLE_MPU      → lerAcelerometro()
+                                            mpu.getMotion6() ax/ay
 ```
 
 ### Detalhes técnicos
 
-- **Grid:** 16×14 células de 8px cada, com offset `AREA_Y = 12` para o HUD
-- **Velocidade:** valor inicial configurável, multiplicada por fator ajustável a cada fruta coletada
-- **Spawn:** Posição central `{7, 7}`, comida usa `do...while` para evitar o corpo
-- **Texto:** Helper `printCentrado()` para centralização horizontal
-- **Código bem comentado:** como projeto de aprendizado, cada seção tem explicações detalhadas — ideal para quem está aprendendo
+- **Grid:** 15×14 células de 8px com offset `AREA_Y = 12` para o HUD
+- **I2C:** `Wire.begin(PINO_SDA, PINO_SCL)` com pinos remapeados (D6=SDA, D5=SCL)
+- **Threshold MPU:** `4000` para input do jogo, `8500` para detectar movimento na tela de início
+- **Buff:** `millis()` para temporização não-bloqueante — padrão `inicioBuff` + checagem no loop
+- **Loop principal:** baseado em `millis() - ultimoTick` em vez de `delay()` fixo
+- **Texto:** helper `printCentrado()` para centralização horizontal automática
 
 ---
 
 ## 🚀 Como Compilar e Rodar
 
-### Opção 1 — VS Code + PlatformIO (recomendado)
+### Pré-requisitos
 
-1. Instale o [VS Code](https://code.visualstudio.com/) e a extensão [PlatformIO](https://platformio.org/install/ide?install=vscode)
-2. Clone este repositório:
-```bash
-git clone https://github.com/Gab-Apolinario/snake-esp32.git
+1. [VS Code](https://code.visualstudio.com/) instalado
+2. Extensão [PlatformIO](https://platformio.org/install/ide?install=vscode) instalada
+3. Hardware montado conforme o mapa de pinos acima
+
+### Dependências (platformio.ini)
+
+```ini
+lib_deps =
+    adafruit/Adafruit ST7735 and ST7789 Library
+    adafruit/Adafruit GFX Library
+    electroniccats/mpu6050
 ```
-3. Abra a pasta no VS Code (`File → Open Folder`)
-4. Conecte o ESP32C3 via USB
-5. Clique em **Upload** (→) na barra inferior do PlatformIO
 
-### Opção 2 — Arduino IDE
+### Passos
 
-O projeto também funciona na Arduino IDE. Copie o conteúdo de `src/main.cpp` para um sketch novo, instale as bibliotecas `Adafruit_GFX` e `Adafruit_ST7735` pelo gerenciador de bibliotecas, e selecione a placa ESP32C3.
+```bash
+# 1. Clone o repositório
+git clone https://github.com/Gab-Apolinario/snake-esp32.git
 
-### Controles
+# 2. Abra no VS Code
+code snake-esp32
 
-- **Joystick** → move a cobra (cima, baixo, esquerda, direita)
-- **Mover Joystick** → iniciar jogo / reiniciar após game over
+# 3. Conecte o ESP32C3 via USB
 
----
+# 4. Clique em Upload (→) na barra inferior do PlatformIO
+#    Ou no terminal:
+pio run -t upload
+```
 
-## ⚙️ Variáveis Configuráveis
+### Simulador Wokwi (opcional)
 
-O código foi pensado para ser fácil de ajustar. As principais variáveis ficam no topo do `main.cpp`:
-
-| Variável | O que faz |
-|---|---|
-| `pontosVitoria` | Quantos pontos para vencer |
-| `tamanhoInicial` | Tamanho inicial da cobra |
-| `velocidadeJogo` | Velocidade base (ms entre ticks) |
-| `fatorVelocidade` | Quanto a velocidade aumenta por fruta (ex: 0.95) |
-| `probBuff` | Probabilidade de spawn de fruta com buff |
+Descomente `#define WOKWI_SIM` no topo do código para ativar correções de rotação/espelhamento do simulador.
 
 ---
 
 ## 📚 O que eu aprendi
 
-Este foi meu primeiro projeto com hardware e C++. Até então, só tinha experiência com C# na Unity para desenvolvimento de jogos na faculdade.
+Este projeto foi minha primeira experiência com hardware e C++ (venho de Unity/C#):
 
-**Programação:**
-- Máquinas de estado com constantes inteiras são mais limpas que flags booleanas
+- **Máquinas de estado** com constantes inteiras são mais escaláveis do que flags booleanas para gerenciar fluxo de jogo — o mesmo padrão que uso em Unity com enums
+- **Dois protocolos de comunicação** no mesmo projeto: SPI para o display (4 fios, alta velocidade) e I2C para o MPU-6050 (2 fios compartilhados, endereçamento por `0x68`) — eles coexistem sem conflito
+- **`millis()` vs `delay()`**: `delay()` trava o programa inteiro; `millis()` permite checagens contínuas (input, timers de buff) sem bloquear o loop — equivalente ao `Time.time` do Unity
+- **`=` vs `==`**: bug silencioso em C++ que C# não permite — o compilador não avisa na maioria dos casos
+- **`#define` sem valor** compila mas quebra comparações — sempre incluir o valor numérico
+- **INPUT_PULLUP** é obrigatório em botões: sem ele o pino flutua e gera leituras falsas
+- **Threshold de acelerômetro**: o sensor oscila mesmo parado — valores maiores para detectar intenção de movimento, menores para resposta rápida durante o jogo
 
-- `randomSeed()` e o padrão `do...while` para posicionamento válido de comida
-- A satisfação de ver conhecimento de uma linguagem se transferir naturalmente para outra
+---
 
-**Hardware:**
-- Comunicação SPI para displays
-- Leitura de sinais analógicos (joystick) e digitais (botão)
-- Limitação de GPIOs força pensamento criativo sobre quais periféricos priorizar
-- **Técnica de solda** — aprendi a soldar componentes durante a montagem
+## 📋 Histórico de versões
 
-**Processo:**
-- Em menos de 48 horas saí do zero absoluto em C++/hardware para um jogo completo e funcional
-- Código fortemente comentado como ferramenta de aprendizado pessoal
-- Uso de backups versionados (v1, v2, v3) antes de utilizar Git
+| Versão | O que mudou |
+|---|---|
+| v1.0 | Snake básico com joystick, display ST7735, tela de início animada |
+| v2.0 | Máquina de estados, velocidade dinâmica, tela de vitória, fruta buff |
+| v3.0 | **MPU-6050 integrado** — controle por acelerômetro, toggle de modo via SW, loop com `millis()` |
 
 ---
 
 ## 🔮 Próximos Passos
 
-- [ ] **Controller WiFi UDP** — transformar o ESP32 em controle wireless para jogos Unity
-- [ ] **Mini-games extras** — explorar outros sensores do kit de 37 (HC-SR04, acelerômetro, etc.)
-- [ ] **Controles alternativos** — integrar sensores como input para jogos da faculdade
-- [ ] **Menu de seleção** de jogos no display
-
----
-
-## 🗂️ Estrutura do Projeto
-
-```
-SNAKE_DISPLAY/
-├── src/
-│   └── main.cpp              ← código principal do jogo
-├── BACKUP/
-│   ├── main_v1_telaInicial.cpp
-│   ├── main_v2_telaVitoria.cpp
-│   └── main_v3_Simulador_velocidade.cpp
-├── docs/                      ← fotos e GIFs do projeto
-├── platformio.ini             ← configuração PlatformIO
-├── diagram.json               ← diagrama Wokwi (simulador)
-└── wokwi.toml                 ← config do simulador Wokwi
-```
+- [ ] **Controller WiFi UDP** — enviar dados do MPU-6050 via WiFi para um jogo Unity no PC
+- [ ] **Minimap no display** — display secundário ST7735 no controller mostrando o mapa em tempo real
+- [ ] **Mais jogos** — explorar outros sensores do kit KUONGSHUN
+- [ ] **Caixa impressa em 3D** — enclosure para o controller com MPU
 
 ---
 
@@ -212,6 +218,5 @@ Este projeto é open source para fins educacionais. Sinta-se livre para usar, mo
 ---
 
 <p align="center">
-  <em>Feito com ☕ e muita curiosidade por um dev de jogos aprendendo embedded systems</em><br>
-  <strong>Gabriel Apolinario</strong> · Jogos Digitais
+  <em>Feito com ☕ e muita curiosidade por um dev Unity aprendendo embedded systems</em>
 </p>

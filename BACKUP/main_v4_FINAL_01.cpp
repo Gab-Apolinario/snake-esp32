@@ -3,8 +3,6 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_ST7735.h>
 #include <SPI.h>
-#include <Wire.h>
-#include <MPU6050.h>
 
 // ───── PINOS DISPLAY ─────────────
 //#define WOKWI_SIM //ATIVAR quando estiver simulando virtualmente (Wokwi)
@@ -13,17 +11,16 @@
 #define TFT_RST   D9
 #define TFT_DC    D4
 Adafruit_ST7735 display = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
-int displayRotation = 1;
 
 // ───── CORES (display BGR) ───────────────────
 //inverte valores RGB
 #define VERMELHO         ST77XX_BLUE
 #define AZUL             ST77XX_RED
 #define VERDE            ST77XX_GREEN
-#define VERDE_ESCURO     0x0400
 #define BRANCO           ST77XX_WHITE
 #define PRETO            ST77XX_BLACK
 #define CINZA            0x4208
+#define VERDE_ESCURO     0x0400
 #define MAGENTA          0xF81F
 
 // ───── LIMITES REAIS DO DISPLAY ──────────────
@@ -53,21 +50,9 @@ int displayRotation = 1;
 #define ESQUERDA  3
 
 // ───── PINOS JOYSTICK ─────────────────────────────────
+#define PINO_LED  D6
 #define PINO_VRX  A1 
 #define PINO_VRY  A2
-#define PINO_SW   D3
-int swAnterior =  HIGH;
-
-// ───── PINOS MPU ─────────────────────────────────
-#define PINO_SCL  D5
-#define PINO_SDA  D6
-
-MPU6050 mpu;
-
-// ───── MODOS CONTROLE ─────────────────────────────────
-#define CONTROLE_JOYSTICK 0
-#define CONTROLE_MPU      1
-int modoControle = CONTROLE_MPU;
 
 // ───── ESTADO DO JOGO / VARIAVEIS ────────────────────────
 struct Pos { int x, y; }; //guarda posição em grid
@@ -304,88 +289,6 @@ void lerJoystick() {
 }
 
 // ═══════════════════════════════════════════
-// INPUT ACELERÔMETRO
-// ═══════════════════════════════════════════
-
-//setRotation(3)
-void lerAcelerometro(){
-  int16_t ax, ay, az, gx, gy, gz;
-  mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-
-  #define THRESHOLD 4000
-
-  if (displayRotation == 3){
-      if (ay < -THRESHOLD && direcao != BAIXO){
-      proximaDirecao = CIMA;
-    }
-    if (ax < - THRESHOLD && direcao != ESQUERDA){
-      proximaDirecao = DIREITA;
-    }
-    if (ay > THRESHOLD && direcao != CIMA){
-      proximaDirecao = BAIXO;
-    }
-    if (ax > THRESHOLD && direcao != DIREITA){
-      proximaDirecao = ESQUERDA;
-    }
-  }else{
-    if (ay > THRESHOLD && direcao != BAIXO){
-      proximaDirecao = CIMA;
-    }
-    if (ax > THRESHOLD && direcao != ESQUERDA){
-      proximaDirecao = DIREITA;
-    }
-    if (ay < -THRESHOLD && direcao != CIMA){
-      proximaDirecao = BAIXO;
-    }
-    if (ax < -THRESHOLD && direcao != DIREITA){
-      proximaDirecao = ESQUERDA;
-    }
-  }
-}
-
-void lerControle(){
-  if (modoControle == CONTROLE_JOYSTICK){
-    lerJoystick();
-  }else{
-    lerAcelerometro();
-  }
-}
-
-void verificarToggle(){
-  int swAtual = digitalRead(PINO_SW);
-
-  if (swAtual == LOW && swAnterior == HIGH){
-    if (modoControle == CONTROLE_JOYSTICK){
-      modoControle = CONTROLE_MPU;
-    }else{
-      modoControle = CONTROLE_JOYSTICK;
-    }
-
-    display.setTextSize(1);
-    display.setTextColor(MAGENTA, PRETO);
-    display.setCursor(TELA_X_MIN, TELA_Y_MIN + 1);
-    if (modoControle == CONTROLE_MPU)
-      display.print("MPU  ");
-    else
-      display.print("JOY  ");
-  }
-
-  swAnterior = swAtual; //salvar para a próxima comparação
-}
-
-bool detectarMovimento(){
-  if (modoControle == CONTROLE_JOYSTICK) {
-    int x = analogRead(PINO_VRX);
-    int y = analogRead(PINO_VRY);
-    return (x > 3000 || x < 1000 || y > 3000 || y < 1000);
-  } else {
-    int16_t ax, ay, az, gx, gy, gz;
-    mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-    return (ax > 8500 || ax < -8500 || ay > 8500 || ay < -8500);
-  }
-}
-
-// ═══════════════════════════════════════════
 // TICK DO JOGO — roda uma vez por loop
 // ═══════════════════════════════════════════
 void tickJogo() {
@@ -439,6 +342,11 @@ void tickJogo() {
       tamCobra++;
       pontos++;
       desenharScore();
+      
+      //LED pisca
+      digitalWrite(PINO_LED, HIGH);
+      delay(120);
+      digitalWrite(PINO_LED, LOW);
     }
   }else{
     //apaga o rabo
@@ -488,6 +396,8 @@ void telaGameOver() {
 
   estadoJogo = ESTADO_GAMEOVER;
 
+  // display.setTextSize(2);
+  // display.setTextColor(VERMELHO);
   printCentrado("GAME", 30, BRANCO, 2, BRANCO);
   printCentrado("OVER", 52, BRANCO, 2, BRANCO);
 
@@ -528,17 +438,8 @@ void telaVitoria(){
 // ═══════════════════════════════════════════
 void setup() {
   Serial.begin(115200);
-  pinMode(PINO_SW, INPUT_PULLUP);
+  pinMode(PINO_LED, OUTPUT);
 
-  //MPU
-  Wire.begin(PINO_SDA, PINO_SCL);
-  mpu.initialize();
-  if (mpu.testConnection()) {
-  Serial.println("MPU-6050 conectado!");
-} else {
-  Serial.println("ERRO: sensor não encontrado");
-}
-  
   display.initR(INITR_BLACKTAB);
 
 //SIMULADOR WOKWI
@@ -549,7 +450,7 @@ void setup() {
   uint8_t madctl = 0xE0;  // rotação 3 + espelha colunas
   display.sendCommand(ST77XX_MADCTL, &madctl, 1);
 #else
-  display.setRotation(displayRotation);
+  display.setRotation(3);
 #endif
 
   randomSeed(analogRead(A0));
@@ -559,11 +460,12 @@ void setup() {
 
 void loop() {
 
-  verificarToggle();
-  lerControle();
-  
+  lerJoystick();
+
   if (estadoJogo == ESTADO_INICIO) {
-    if (detectarMovimento()) {
+    int x = analogRead(PINO_VRX);
+    int y = analogRead(PINO_VRY);
+    if (x > 3000 || x < 1000 || y > 3000 || y < 1000) {
       delay(300);
       iniciarJogo();
       estadoJogo = ESTADO_JOGANDO;
@@ -576,7 +478,9 @@ void loop() {
   }
 
   if (estadoJogo == ESTADO_GAMEOVER || estadoJogo == ESTADO_VITORIA) {
-    if (detectarMovimento()) {
+    int x = analogRead(PINO_VRX);
+    int y = analogRead(PINO_VRY);
+    if (x > 3000 || x < 1000 || y > 3000 || y < 1000) {
       delay(300);
       iniciarJogo();
       estadoJogo = ESTADO_JOGANDO;
